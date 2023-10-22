@@ -60,7 +60,7 @@ export class App extends Component {
           <h1>Phonebook</h1>
           <ContactForm addContact={this.handleAddContact} />
 
-          <h2>Find contacts by name</h2>
+          <h2>Contacts List</h2>
           <Filter filteredContacts={this.handleChangeFilter} />
           <ContactList
             list={this.handleContactFilter()}
