@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import { nanoid } from 'nanoid';
+import ContactForm from './ContactForm';
+import Filter from './Filter';
+import ContactList from './ContactList';
 
 export class App extends Component {
   state = {
@@ -9,19 +12,30 @@ export class App extends Component {
       { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
       { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
     ],
-    name: '',
-    number: '',
-    filter: '',
-  };
 
-  handleChangeInput = e => {
-    e.target.name === 'name'
-      ? this.setState({ name: e.target.value })
-      : this.setState({ number: e.target.value });
+    filter: '',
   };
 
   handleChangeFilter = e => {
     this.setState({ filter: e.target.value });
+  };
+
+  handleAddContact = contactData => {
+    const { contacts } = this.state;
+    const existingName = contacts.find(
+      contact =>
+        contact.name.toLocaleLowerCase().trim() ===
+        contactData.name.toLocaleLowerCase().trim()
+    );
+
+    if (existingName) {
+      alert(`${contactData.name} is already in your contacts.`);
+    } else {
+      const newContact = { id: nanoid(), ...contactData };
+      this.setState(prevState => ({
+        contacts: [...prevState.contacts, newContact],
+      }));
+    }
   };
 
   handleContactFilter = () => {
@@ -33,66 +47,25 @@ export class App extends Component {
     );
   };
 
-  handleAddContact = () => {
-    if (this.state.name.trim() === '') {
-      return;
-    }
-
-    const newContact = {
-      id: nanoid(),
-      name: this.state.name,
-      number: this.state.number,
-    };
-
+  handleDeleteContact = id => {
     this.setState(prevState => ({
-      contacts: [...prevState.contacts, newContact],
-      name: '',
-      number: '',
+      contacts: prevState.contacts.filter(contact => contact.id !== id),
     }));
   };
 
   render() {
-    const filter = this.handleContactFilter();
-
     return (
       <>
         <div>
           <h1>Phonebook</h1>
-          <label htmlFor="name">
-            Name
-            <input
-              type="text"
-              name="name"
-              required
-              onChange={this.handleChangeInput}
-            />
-          </label>
-          <label htmlFor="number">
-            Number
-            <input
-              type="tel"
-              name="number"
-              required
-              onChange={this.handleChangeInput}
-            />
-          </label>
-          <button onClick={this.handleAddContact}>Add Contact</button>
-        </div>
-        <div>
-          <ul>
-            <input
-              type="text"
-              name="filter"
-              onChange={this.handleChangeFilter}
-            />
-            {filter.map(item => {
-              return (
-                <li key={item.id}>
-                  {item.name} : {item.number}
-                </li>
-              );
-            })}
-          </ul>
+          <ContactForm addContact={this.handleAddContact} />
+
+          <h2>Find contacts by name</h2>
+          <Filter filteredContacts={this.handleChangeFilter} />
+          <ContactList
+            list={this.handleContactFilter()}
+            deleteContact={this.handleDeleteContact}
+          />
         </div>
       </>
     );
