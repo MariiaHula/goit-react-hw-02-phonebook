@@ -1,9 +1,15 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { Label, Button } from 'styles/Styles';
 
 class ContactForm extends Component {
   state = {
     name: '',
     number: '',
+  };
+
+  static propTypes = {
+    addContact: PropTypes.func.isRequired,
   };
 
   handleChangeInput = ({ target }) => {
@@ -14,38 +20,44 @@ class ContactForm extends Component {
   handleAddNewContactOnSubmit = e => {
     e.preventDefault();
     const { name, number } = this.state;
-
     if (name.trim() === '' || number.trim() === '') {
       return;
     }
-
     this.props.addContact({ name, number });
+    this.reset();
+  };
+
+  reset = () => {
     this.setState({ name: '', number: '' });
-    e.target.reset();
   };
 
   render() {
+    const { name, number } = this.state;
+    const addContactOnSubmit = this.handleAddNewContactOnSubmit;
+
     return (
-      <form onSubmit={this.handleAddNewContactOnSubmit}>
-        <label htmlFor="name">
+      <form onSubmit={addContactOnSubmit}>
+        <Label>
           Name
           <input
             type="text"
             name="name"
+            value={name}
             required
             onChange={this.handleChangeInput}
           />
-        </label>
-        <label htmlFor="number">
+        </Label>
+        <Label>
           Number
           <input
             type="tel"
             name="number"
+            value={number}
             required
             onChange={this.handleChangeInput}
           />
-        </label>
-        <button type="submit">Add Contact</button>
+        </Label>
+        <Button type="submit">Add Contact</Button>
       </form>
     );
   }

@@ -3,6 +3,8 @@ import { nanoid } from 'nanoid';
 import ContactForm from './ContactForm';
 import Filter from './Filter';
 import ContactList from './ContactList';
+import Notification from './Notification';
+import { Wrapper } from '../styles/Styles';
 
 export class App extends Component {
   state = {
@@ -22,13 +24,13 @@ export class App extends Component {
 
   handleAddContact = contactData => {
     const { contacts } = this.state;
-    const existingName = contacts.find(
+    const nameExists = contacts.find(
       contact =>
         contact.name.toLocaleLowerCase().trim() ===
         contactData.name.toLocaleLowerCase().trim()
     );
 
-    if (existingName) {
+    if (nameExists) {
       alert(`${contactData.name} is already in your contacts.`);
     } else {
       const newContact = { id: nanoid(), ...contactData };
@@ -54,19 +56,24 @@ export class App extends Component {
   };
 
   render() {
+    const { contacts } = this.state;
+    const handleContactFilter = this.handleContactFilter();
     return (
       <>
-        <div>
+        <Wrapper>
           <h1>Phonebook</h1>
           <ContactForm addContact={this.handleAddContact} />
-
           <h2>Contacts List</h2>
           <Filter filteredContacts={this.handleChangeFilter} />
-          <ContactList
-            list={this.handleContactFilter()}
-            deleteContact={this.handleDeleteContact}
-          />
-        </div>
+          {contacts.length ? (
+            <ContactList
+              list={handleContactFilter}
+              onDeleteContact={this.handleDeleteContact}
+            />
+          ) : (
+            <Notification message="Your contact list is empty" />
+          )}
+        </Wrapper>
       </>
     );
   }
